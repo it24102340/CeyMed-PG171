@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - CeyMed Insurance Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .admin-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem 0; margin-bottom: 2rem; }
+        .user-card { transition: transform 0.3s ease; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);} 
+        .user-card:hover { transform: translateY(-2px); }
+        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); border: none; }
+        .btn-primary:hover { background: linear-gradient(45deg, #5a6fd8, #6a4190); }
+        .btn-danger { background: linear-gradient(45deg, #dc3545, #c82333); border: none; }
+        .btn-success { background: linear-gradient(45deg, #28a745, #218838); border: none; }
+        .btn-warning { background: linear-gradient(45deg, #ffc107, #e0a800); border: none; }
+        .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 2rem; }
+        .action-btn { flex: 1; min-width: 200px; padding: 15px; text-align: center; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/"><i class="fas fa-shield-alt me-2"></i>CeyMed Insurance - Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/policy/admin">Policies</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/user/admin/users">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/purchase/admin/stop-requests">Stop Requests</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/feedback/admin/all">Feedback</a></li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"><i class="fas fa-user-shield me-1"></i>Admin</a>
+                        <ul class="dropdown-menu"><li><a class="dropdown-item" href="/user/logout">Logout</a></li></ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="admin-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="fw-bold mb-2"><i class="fas fa-users me-2"></i>User Management</h1>
+                    <p class="mb-0">Use this section to manage customer details. As an admin, you can view, add, update, or delete any user information.</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        <i class="fas fa-plus me-2"></i>Add New User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <div class="btn btn-success action-btn" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="fas fa-plus fa-2x mb-2"></i>
+                <h5>➕ Add New User</h5>
+                <p class="mb-0">Enter all customer details to add a new record.</p>
+            </div>
+            <div class="btn btn-warning action-btn" onclick="scrollToUsers()">
+                <i class="fas fa-edit fa-2x mb-2"></i>
+                <h5>✏️ Update User Details</h5>
+                <p class="mb-0">Edit existing information such as address, salary, occupation, etc.</p>
+            </div>
+            <div class="btn btn-danger action-btn" onclick="scrollToUsers()">
+                <i class="fas fa-trash fa-2x mb-2"></i>
+                <h5>❌ Delete User</h5>
+                <p class="mb-0">Permanently remove a customer record from the system.</p>
+            </div>
+            <div class="btn btn-primary action-btn" onclick="scrollToUsers()">
+                <i class="fas fa-list fa-2x mb-2"></i>
+                <h5>📋 View All Users</h5>
+                <p class="mb-0">Display all registered users with their details.</p>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Registered Users</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Date of Birth</th>
+                                <th>Marital Status</th>
+                                <th>Occupation</th>
+                                <th>Monthly Salary</th>
+                                <th>Role</th>
+                                <th>Address</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${users}">
+                                <td th:text="${user.id}">1</td>
+                                <td><span class="badge bg-primary" th:text="${user.customerId}">C001</span></td>
+                                <td th:text="${user.firstName + ' ' + user.lastName}">John Doe</td>
+                                <td th:text="${user.email}">john@example.com</td>
+                                <td th:text="${user.dateOfBirth}">1990-01-01</td>
+                                <td><span class="badge" th:classappend="${user.maritalStatus == 'Married'} ? 'bg-success' : 'bg-warning'" th:text="${user.maritalStatus}">Single</span></td>
+                                <td th:text="${user.occupation}">Engineer</td>
+                                <td class="fw-bold text-success" th:text="${user.monthlySalary}">50000.00</td>
+                                <td>
+                                    <span class="badge" th:classappend="${user.isAdmin} ? 'bg-danger' : (${user.isStaff} ? 'bg-warning' : 'bg-info')" 
+                                          th:text="${user.isAdmin} ? 'Admin' : (${user.isStaff} ? 'Staff' : 'Customer')">Customer</span>
+                                </td>
+                                <td th:text="${user.address}">123 Main St</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                th:attr="data-id=${user.id},
+                                                         data-firstname=${user.firstName},
+                                                         data-lastname=${user.lastName},
+                                                         data-customerid=${user.customerId},
+                                                         data-email=${user.email},
+                                                         data-dateofbirth=${user.dateOfBirth},
+                                                         data-address=${user.address},
+                                                         data-occupation=${user.occupation},
+                                                         data-monthlysalary=${user.monthlySalary},
+                                                         data-maritalstatus=${user.maritalStatus},
+                                                         data-gender=${user.gender},
+                                                         data-isadmin=${user.isAdmin},
+                                                         data-isstaff=${user.isStaff}"
+                                                onclick="openEditUser(this)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" 
+                                                th:onclick="'deleteUser(' + ${user.id} + ')'">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Add New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/user/admin/users/create}" th:object="${userRegistrationDto}" method="post">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="role" class="form-label">User Role</label>
+                                <select class="form-select" id="role" th:field="*{role}" required>
+                                    <option value="">Select Role</option>
+                                    <option value="customer">Customer</option>
+                                    <option value="staff">Staff Member</option>
+                                    <option value="admin">Administrator</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">User ID</label>
+                                <input type="text" class="form-control" value="Auto-generated" disabled>
+                                <div class="form-text">User ID will be automatically generated based on role:
+                                    <br>• Customer: C001, C002, etc.
+                                    <br>• Staff: S001, S002, etc.
+                                    <br>• Admin: A001, A002, etc.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender" th:field="*{gender}" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="maritalStatus" class="form-label">Marital Status</label>
+                                <select class="form-select" id="maritalStatus" th:field="*{maritalStatus}" required>
+                                    <option value="">Select Marital Status</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="occupation" class="form-label">Occupation</label>
+                                <input type="text" class="form-control" id="occupation" th:field="*{occupation}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="monthlySalary" class="form-label">Monthly Salary</label>
+                            <input type="number" class="form-control" id="monthlySalary" th:field="*{monthlySalary}" step="0.01" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" th:field="*{address}" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Create User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit User Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editUserForm" method="post">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editFirstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="editFirstName" name="firstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editLastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="editLastName" name="lastName" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editCustomerId" class="form-label">Customer ID</label>
+                                <input type="text" class="form-control" id="editCustomerId" name="customerId" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editRole" class="form-label">User Role</label>
+                                <select class="form-select" id="editRole" name="role" required>
+                                    <option value="customer">Customer</option>
+                                    <option value="staff">Staff Member</option>
+                                    <option value="admin">Administrator</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editEmail" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="editEmail" name="email" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editPassword" class="form-label">Password (Leave blank to keep current)</label>
+                                <input type="password" class="form-control" id="editPassword" name="password">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editDateOfBirth" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="editDateOfBirth" name="dateOfBirth" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editGender" class="form-label">Gender</label>
+                                <select class="form-select" id="editGender" name="gender" required>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editMaritalStatus" class="form-label">Marital Status</label>
+                                <select class="form-select" id="editMaritalStatus" name="maritalStatus" required>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editOccupation" class="form-label">Occupation</label>
+                                <input type="text" class="form-control" id="editOccupation" name="occupation" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMonthlySalary" class="form-label">Monthly Salary</label>
+                            <input type="number" class="form-control" id="editMonthlySalary" name="monthlySalary" step="0.01" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAddress" class="form-label">Address</label>
+                            <textarea class="form-control" id="editAddress" name="address" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Update User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openEditUser(btn) {
+            const d = btn.dataset;
+            const form = document.getElementById('editUserForm');
+            form.action = '/user/admin/users/update/' + d.id;
+            
+            document.getElementById('editFirstName').value = d.firstname || '';
+            document.getElementById('editLastName').value = d.lastname || '';
+            document.getElementById('editCustomerId').value = d.customerid || '';
+            document.getElementById('editEmail').value = d.email || '';
+            document.getElementById('editDateOfBirth').value = d.dateofbirth || '';
+            document.getElementById('editAddress').value = d.address || '';
+            document.getElementById('editOccupation').value = d.occupation || '';
+            document.getElementById('editMonthlySalary').value = d.monthlysalary || '';
+            document.getElementById('editMaritalStatus').value = d.maritalstatus || '';
+            document.getElementById('editGender').value = d.gender || '';
+            
+            // Set role based on isAdmin and isStaff flags
+            if (d.isadmin === 'true') {
+                document.getElementById('editRole').value = 'admin';
+            } else if (d.isstaff === 'true') {
+                document.getElementById('editRole').value = 'staff';
+            } else {
+                document.getElementById('editRole').value = 'customer';
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+            modal.show();
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/user/admin/users/delete/' + userId;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function scrollToUsers() {
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
+

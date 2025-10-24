@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff - All Payments - CeyMed Insurance</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .header-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem 0; margin-bottom: 2rem; }
+        .card { border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 15px; }
+        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); border: none; }
+        .btn-primary:hover { background: linear-gradient(45deg, #5a6fd8, #6a4190); }
+        .table { border-radius: 10px; overflow: hidden; }
+        .table thead th { background-color: #667eea; color: white; border: none; }
+        .badge { font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <!-- Header removed - standalone template -->
+
+    <div class="header-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-4"><i class="fas fa-credit-card me-3"></i>All Payment Details</h1>
+                    <p class="lead">View all payment transactions from the database.</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="/user/staff/dashboard" class="btn btn-light btn-lg">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Payment Records</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Payment ID</th>
+                                        <th>Customer ID</th>
+                                        <th>Customer Name</th>
+                                        <th>Amount</th>
+                                        <th>Paid Date</th>
+                                        <th>Paid For Month</th>
+                                        <th>Purchase ID</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="payment : ${payments}">
+                                        <td><span class="badge bg-primary" th:text="${payment.paymentId}">P001</span></td>
+                                        <td><span class="badge bg-info" th:text="${payment.purchase.user.customerId}">C001</span></td>
+                                        <td th:text="${payment.purchase.user.firstName + ' ' + payment.purchase.user.lastName}">John Doe</td>
+                                        <td class="fw-bold text-success" th:text="${payment.amount}">5000.00</td>
+                                        <td th:text="${payment.paidAt}">2024-01-15</td>
+                                        <td th:text="${payment.paidForMonth}">2024-01</td>
+                                        <td><span class="badge bg-info" th:text="${payment.purchase.purchaseId}">PU001</span></td>
+                                        <td><span class="badge bg-success">Completed</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div th:if="${payments == null or payments.isEmpty()}" class="text-center py-5">
+                            <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No payments found</h5>
+                            <p class="text-muted">There are no payment records in the database yet.</p>
+                        </div>
+                        
+                        <div th:if="${payments != null and !payments.isEmpty()}" class="mt-3">
+                            <div class="alert alert-info" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Total Payments:</strong> <span th:text="${#lists.size(payments)}">0</span> records found
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer removed - standalone template -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

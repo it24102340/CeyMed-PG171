@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Claims Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .admin-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem 0; margin-bottom: 2rem; }
+        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); border: none; }
+        .btn-primary:hover { background: linear-gradient(45deg, #5a6fd8, #6a4190); }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/"><i class="fas fa-shield-alt me-2"></i>CeyMed Insurance - Admin</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="/policy/admin">Policies</a></li>
+                <li class="nav-item"><a class="nav-link" href="/user/admin/users">Users</a></li>
+                <li class="nav-item"><a class="nav-link" href="/purchase/admin/stop-requests">Stop Requests</a></li>
+                <li class="nav-item"><a class="nav-link active" href="/claims/admin/all">Claims</a></li>
+                <li class="nav-item"><a class="nav-link" href="/feedback/admin/all">Feedback</a></li>
+                <li class="nav-item"><a class="nav-link" href="/article/admin">Articles</a></li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"><i class="fas fa-user-shield me-1"></i>Admin</a>
+                    <ul class="dropdown-menu"><li><a class="dropdown-item" href="/user/logout">Logout</a></li></ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="admin-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="fw-bold mb-2"><i class="fas fa-clipboard-list me-2"></i>Claims Management</h1>
+                <p class="mb-0">Review and manage insurance claims</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="btn-group" role="group">
+                    <a href="/claims/admin/all" class="btn btn-light">All Claims</a>
+                    <a href="/claims/admin/pending" class="btn btn-light">Pending</a>
+                    <a href="/claims/admin/deletion-requests" class="btn btn-light">Deletion Requests</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+
+    <!-- Success/Error Messages -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Claims Table -->
+    <div th:if="${claims != null and !claims.empty}" class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Claim ID</th>
+                            <th>User ID</th>
+                            <th>Policy ID</th>
+                            <th>Amount</th>
+                            <th>Hospital</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="claim : ${claims}">
+                            <td>
+                                <strong th:text="${claim.claimNumber}"></strong>
+                            </td>
+                            <td th:text="${claim.userId}"></td>
+                            <td th:text="${claim.policyId}"></td>
+                            <td>LKR <span th:text="${#numbers.formatDecimal(claim.claimAmount, 1, 2)}"></span></td>
+                            <td th:text="${claim.hospitalName}"></td>
+                            <td>
+                                <span class="badge" th:classappend="${claim.status.name() == 'APPROVED'} ? 'bg-success' : 
+                                                          (${claim.status.name() == 'REJECTED'} ? 'bg-danger' : 
+                                                          (${claim.status.name() == 'PENDING'} ? 'bg-warning' : 'bg-info'))"
+                                      th:text="${claim.status.displayName}"></span>
+                            </td>
+                            <td th:text="${#temporals.format(claim.submissionDate, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a th:href="@{/claims/details/{id}(id=${claim.claimId})}" 
+                                       class="btn btn-outline-primary btn-sm" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a th:href="@{/claims/document/{id}(id=${claim.claimId})}" 
+                                       class="btn btn-outline-secondary btn-sm" title="Download Bill">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    <button th:if="${claim.status.name() == 'PENDING'}" 
+                                            class="btn btn-outline-success btn-sm" 
+                                            th:onclick="'updateStatus(' + ${claim.claimId} + ', \'APPROVED\')'" 
+                                            title="Approve">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button th:if="${claim.status.name() == 'PENDING'}" 
+                                            class="btn btn-outline-danger btn-sm" 
+                                            th:onclick="'updateStatus(' + ${claim.claimId} + ', \'REJECTED\')'" 
+                                            title="Reject">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${claims == null or claims.empty}" class="text-center py-5">
+        <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No Claims Found</h4>
+        <p class="text-muted">There are no claims to display.</p>
+    </div>
+</div>
+
+<!-- Status Update Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Claim Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="statusForm" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="APPROVED">Approved</option>
+                            <option value="REJECTED">Rejected</option>
+                            <option value="UNDER_REVIEW">Under Review</option>
+                            <option value="REQUIRES_DOCUMENTS">Requires Additional Documents</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="adminMessage" class="form-label">Admin Message (Optional)</label>
+                        <textarea class="form-control" id="adminMessage" name="adminMessage" rows="3" 
+                                  placeholder="Add a message for the user..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function updateStatus(claimId, status) {
+        const form = document.getElementById('statusForm');
+        form.action = '/claims/admin/update-status?claimId=' + claimId;
+        document.getElementById('status').value = status;
+        const modal = new bootstrap.Modal(document.getElementById('statusModal'));
+        modal.show();
+    }
+</script>
+</body>
+</html>
