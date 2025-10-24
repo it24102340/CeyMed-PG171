@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - All Feedback - CeyMed Insurance</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .rating-stars { color: #ffc107; }
+        .admin-card { border-left: 4px solid #dc3545; }
+        .feedback-card { transition: transform 0.2s; }
+        .feedback-card:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/"><i class="fas fa-shield-alt me-2"></i>CeyMed Insurance</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/policy/admin">Admin Dashboard</a>
+                <a class="nav-link" href="/user/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2><i class="fas fa-comments me-2"></i>All Customer Feedback</h2>
+                        <p class="text-muted">View and manage all customer feedback across all policies</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card admin-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-comments fa-2x text-primary mb-2"></i>
+                        <h4 th:text="${totalCount}">0</h4>
+                        <p class="text-muted mb-0">Total Feedback</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card admin-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-filter fa-2x text-info mb-2"></i>
+                        <h4><a href="/feedback/admin/by-policy" class="text-decoration-none">By Policy</a></h4>
+                        <p class="text-muted mb-0">View by Policy</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card admin-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-2x text-success mb-2"></i>
+                        <h4><a href="/feedback/admin/by-user" class="text-decoration-none">By User</a></h4>
+                        <p class="text-muted mb-0">View by User</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback List -->
+        <div th:if="${feedbacks != null and !feedbacks.empty}">
+            <div class="row g-4">
+                <div class="col-12" th:each="feedback : ${feedbacks}">
+                    <div class="card feedback-card shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h6 class="card-title mb-1">
+                                        <span class="badge bg-primary me-2">Feedback #<span th:text="${feedback.id}">ID</span></span>
+                                        User ID: <span th:text="${feedback.userId}">User</span> | Policy ID: <span th:text="${feedback.policyId}">Policy</span>
+                                    </h6>
+                                    <small class="text-muted" th:text="${feedback.createdAt}">Date</small>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rating-stars">
+                                        <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                                              th:classappend="${i <= feedback.rating} ? '' : 'text-muted'">★</span>
+                                    </div>
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{'/feedback/admin/user/' + ${feedback.userId}}" class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-user"></i>
+                                        </a>
+                                        <a th:href="@{'/feedback/admin/policy/' + ${feedback.policyId}}" class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-file-alt"></i>
+                                        </a>
+                                        <form th:action="@{'/feedback/admin/delete/' + ${feedback.id}}" method="post" class="d-inline" 
+                                              onsubmit="return confirm('Are you sure you want to delete this feedback?')">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="card-text" th:text="${feedback.comments}">Feedback comments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${feedbacks == null or feedbacks.empty}" class="text-center py-5">
+            <div class="card">
+                <div class="card-body">
+                    <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Feedback Available</h5>
+                    <p class="text-muted">No customer feedback has been submitted yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
