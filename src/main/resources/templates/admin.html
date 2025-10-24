@@ -24,7 +24,11 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link active" href="/policy/admin">Policies</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/admin/users">Users</a></li>
                     <li class="nav-item"><a class="nav-link" href="/purchase/admin/stop-requests">Stop Requests</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/claims/admin/all">Claims</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/feedback/admin/all">Feedback</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/article/admin">Articles</a></li>
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
@@ -55,7 +59,21 @@
                     <tbody><tr th:each="policy : ${policies}"><td th:text="${policy.policyId}">1</td><td th:text="${policy.policyName}">Policy</td>
                         <td><span class="badge" th:classappend="${policy.category == 'Premium'} ? 'bg-warning' : (${policy.category == 'Gold'} ? 'bg-success' : 'bg-secondary')" th:text="${policy.category}">Category</span></td>
                         <td th:text="${policy.coverage}">0.00</td><td th:text="${policy.premium}">0.00</td><td th:text="${policy.duration} + ' months'">0 months</td><td class="fw-bold text-primary" th:text="${policy.monthlyCost}">0.00</td><td th:text="${policy.startDate}">2024-01-01</td><td th:text="${policy.endDate}">2024-12-31</td>
-                        <td><div class="btn-group" role="group"><button class="btn btn-sm btn-outline-primary" th:onclick="'editPolicy(' + ${policy.policyId} + ')' "><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" th:onclick="'deletePolicy(' + ${policy.policyId} + ')' "><i class="fas fa-trash"></i></button></div></td></tr></tbody>
+                        <td><div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-primary"
+                                    th:attr="data-id=${policy.policyId},
+                                             data-name=${policy.policyName},
+                                             data-category=${policy.category},
+                                             data-coverage=${policy.coverage},
+                                             data-premium=${policy.premium},
+                                             data-start=${policy.startDate},
+                                             data-end=${policy.endDate},
+                                             data-duration=${policy.duration},
+                                             data-spec=${policy.specification},
+                                             data-notes=${policy.notes}"
+                                    onclick="openEdit(this)"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" th:onclick="'deletePolicy(' + ${policy.policyId} + ')' "><i class="fas fa-trash"></i></button>
+                        </div></td></tr></tbody>
                 </table></div></div>
         </div>
     </div>
@@ -67,9 +85,12 @@
                 <div class="col-md-6 mb-3"><label for="category" class="form-label">Category</label><select class="form-select" id="category" th:field="*{category}" required><option value="">Select Category</option><option value="Premium">Premium</option><option value="Gold">Gold</option><option value="Silver">Silver</option></select></div></div>
                 <div class="row"><div class="col-md-6 mb-3"><label for="coverage" class="form-label">Coverage</label><input type="number" class="form-control" id="coverage" th:field="*{coverage}" step="0.01" min="0" required></div>
                     <div class="col-md-6 mb-3"><label for="premium" class="form-label">Premium</label><input type="number" class="form-control" id="premium" th:field="*{premium}" step="0.01" min="0" required></div></div>
+                    
                 <div class="row"><div class="col-md-6 mb-3"><label for="startDate" class="form-label">Start Date</label><input type="date" class="form-control" id="startDate" th:field="*{startDate}" required></div>
                     <div class="col-md-6 mb-3"><label for="endDate" class="form-label">End Date</label><input type="date" class="form-control" id="endDate" th:field="*{endDate}" required></div></div>
                 <div class="mb-3"><label for="duration" class="form-label">Duration (months)</label><input type="number" class="form-control" id="duration" th:field="*{duration}" min="1" required></div>
+                <div class="mb-3"><label for="spec" class="form-label">Specification</label><textarea class="form-control" id="spec" th:field="*{specification}" rows="3" placeholder="Key features, coverage details, exclusions..."></textarea></div>
+                <div class="mb-3"><label for="notes" class="form-label">Notes</label><textarea class="form-control" id="notes" th:field="*{notes}" rows="3" placeholder="Internal notes or public remarks..."></textarea></div>
             </div>
             <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Create Policy</button></div>
         </form>
@@ -85,6 +106,8 @@
                 <div class="row"><div class="col-md-6 mb-3"><label for="editStartDate" class="form-label">Start Date</label><input type="date" class="form-control" id="editStartDate" name="startDate" required></div>
                     <div class="col-md-6 mb-3"><label for="editEndDate" class="form-label">End Date</label><input type="date" class="form-control" id="editEndDate" name="endDate" required></div></div>
                 <div class="mb-3"><label for="editDuration" class="form-label">Duration (months)</label><input type="number" class="form-control" id="editDuration" name="duration" min="1" required></div>
+                <div class="mb-3"><label for="editSpec" class="form-label">Specification</label><textarea class="form-control" id="editSpec" name="specification" rows="3" placeholder="Key features, coverage details, exclusions..."></textarea></div>
+                <div class="mb-3"><label for="editNotes" class="form-label">Notes</label><textarea class="form-control" id="editNotes" name="notes" rows="3" placeholder="Internal notes or public remarks..."></textarea></div>
             </div>
             <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Update Policy</button></div>
         </form>
@@ -92,7 +115,22 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function editPolicy(policyId){ document.getElementById('editPolicyForm').action = '/policy/admin/update/' + policyId; const modal = new bootstrap.Modal(document.getElementById('editPolicyModal')); modal.show(); }
+        function openEdit(btn){
+            const d = btn.dataset;
+            const form = document.getElementById('editPolicyForm');
+            form.action = '/policy/admin/update/' + d.id;
+            document.getElementById('editPolicyName').value = d.name || '';
+            document.getElementById('editCategory').value = d.category || '';
+            document.getElementById('editCoverage').value = d.coverage || '';
+            document.getElementById('editPremium').value = d.premium || '';
+            document.getElementById('editStartDate').value = d.start || '';
+            document.getElementById('editEndDate').value = d.end || '';
+            document.getElementById('editDuration').value = d.duration || '';
+            document.getElementById('editSpec').value = d.spec || '';
+            document.getElementById('editNotes').value = d.notes || '';
+            const modal = new bootstrap.Modal(document.getElementById('editPolicyModal'));
+            modal.show();
+        }
         function deletePolicy(policyId){ if(confirm('Delete policy '+policyId+'?')){ const form = document.createElement('form'); form.method='POST'; form.action='/policy/admin/delete/'+policyId; document.body.appendChild(form); form.submit(); } }
     </script>
 </body>

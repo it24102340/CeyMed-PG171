@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff - Payment History - CeyMed Insurance</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .header-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem 0; margin-bottom: 2rem; }
+        .card { border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 15px; }
+        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); border: none; }
+        .btn-primary:hover { background: linear-gradient(45deg, #5a6fd8, #6a4190); }
+        .customer-card { transition: transform 0.2s; }
+        .customer-card:hover { transform: translateY(-5px); }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="header-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-4"><i class="fas fa-credit-card me-3"></i>Payment History Management</h1>
+                    <p class="lead">View and manage payment histories for all customers.</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="/user/staff/dashboard" class="btn btn-light btn-lg">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-users me-2"></i>All Customers</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div th:each="customer : ${customers}" class="col-md-6 col-lg-4 mb-3">
+                                <div class="card customer-card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-user fa-3x text-primary mb-3"></i>
+                                        <h6 class="card-title" th:text="${customer.firstName + ' ' + customer.lastName}">Customer Name</h6>
+                                        <p class="card-text">
+                                            <strong>ID:</strong> <span th:text="${customer.customerId}">C001</span><br>
+                                            <strong>Email:</strong> <span th:text="${customer.email}">customer@example.com</span><br>
+                                            <strong>Occupation:</strong> <span th:text="${customer.occupation}">Engineer</span>
+                                        </p>
+                                        <a th:href="@{/user/staff/customer/{customerId}(customerId=${customer.customerId})}" 
+                                           class="btn btn-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>View Payment History
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div th:if="${customers == null or customers.isEmpty()}" class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No customers found</h5>
+                            <p class="text-muted">There are no customers registered in the system yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Policy Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="/"><i class="fas fa-shield-alt me-2"></i>CeyMed Insurance</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/policy/policies">Policies</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <div class="card">
+        <div class="card-header"><h4 class="mb-0" th:text="${policy.policyName}">Policy</h4></div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-3"><strong>ID</strong><div th:text="${policy.policyId}">0</div></div>
+                <div class="col-md-3"><strong>Category</strong><div th:text="${policy.category}">Category</div></div>
+                <div class="col-md-3"><strong>Coverage</strong><div th:text="${policy.coverage}">0.00</div></div>
+                <div class="col-md-3"><strong>Premium</strong><div th:text="${policy.premium}">0.00</div></div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3"><strong>Duration</strong><div th:text="${policy.duration} + ' months'">0 months</div></div>
+                <div class="col-md-3"><strong>Monthly Cost</strong><div class="text-primary fw-bold" th:text="${policy.monthlyCost}">0.00</div></div>
+                <div class="col-md-6"><strong>Dates</strong><div th:text="${policy.startDate} + ' to ' + ${policy.endDate}">dates</div></div>
+            </div>
+            <div class="mb-3" th:if="${policy.specification}"><strong>Specification</strong><div class="mt-1" th:text="${policy.specification}">spec</div></div>
+            <div class="mb-3" th:if="${policy.notes}"><strong>Notes</strong><div class="mt-1" th:text="${policy.notes}">notes</div></div>
+            <a class="btn btn-primary" th:href="@{'/purchase/create'(policyId=${policy.policyId})}"><i class="fas fa-shopping-cart me-1"></i>Purchase</a>
+            <a class="btn btn-success ms-2" th:href="@{'/feedback/create/' + ${policy.policyId}}"><i class="fas fa-star me-1"></i>Give Feedback</a>
+            <a class="btn btn-info ms-2" th:href="@{'/feedback/policy/' + ${policy.policyId}}"><i class="fas fa-comments me-1"></i>View Reviews</a>
+            <a class="btn btn-outline-secondary ms-2" href="/policy/policies">Back</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+

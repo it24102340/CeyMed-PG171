@@ -35,47 +35,147 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                         <form th:action="@{/user/signup}" th:object="${userRegistrationDto}" method="post">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="firstName" class="form-label">First Name</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                        <input type="text" class="form-control" id="firstName" th:field="*{firstName}" placeholder="Enter your first name" required>
-                                    </div>
-                                    <div th:if="${#fields.hasErrors('firstName')}" class="text-danger small mt-1"><span th:errors="*{firstName}"></span></div>
+                            <!-- First Name -->
+                            <div class="mb-3">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="firstName" th:field="*{firstName}" placeholder="Enter your first name" required>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="lastName" class="form-label">Last Name</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                        <input type="text" class="form-control" id="lastName" th:field="*{lastName}" placeholder="Enter your last name" required>
-                                    </div>
-                                    <div th:if="${#fields.hasErrors('lastName')}" class="text-danger small mt-1"><span th:errors="*{lastName}"></span></div>
+                                <div th:if="${#fields.hasErrors('firstName')}" class="text-danger small mt-1"><span th:errors="*{firstName}"></span></div>
+                            </div>
+
+                            <!-- Last Name -->
+                            <div class="mb-3">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="lastName" th:field="*{lastName}" placeholder="Enter your last name" required>
+                                </div>
+                                <div th:if="${#fields.hasErrors('lastName')}" class="text-danger small mt-1"><span th:errors="*{lastName}"></span></div>
+                            </div>
+
+                            <!-- Customer ID Information -->
+                            <div class="mb-3">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Your Customer ID will be automatically generated</strong> (e.g., C001, C002, C003) and displayed after successful registration.
                                 </div>
                             </div>
+
+                            <!-- Role Selection -->
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Account Type</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                    <select class="form-select" id="role" th:field="*{role}" required>
+                                        <option value="customer">Customer</option>
+                                    </select>
+                                </div>
+                                <div class="form-text">You are registering as a customer.</div>
+                                <div th:if="${#fields.hasErrors('role')}" class="text-danger small mt-1"><span th:errors="*{role}"></span></div>
+                            </div>
+
+                            <!-- Date of Birth -->
+                            <div class="mb-3">
+                                <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                    <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}" required>
+                                </div>
+                                <div class="form-text">Enter your birthday (YYYY-MM-DD).</div>
+                                <div th:if="${#fields.hasErrors('dateOfBirth')}" class="text-danger small mt-1"><span th:errors="*{dateOfBirth}"></span></div>
+                            </div>
+
+                            <!-- Address -->
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-home"></i></span>
+                                    <textarea class="form-control" id="address" th:field="*{address}" placeholder="Enter your home address" rows="3" required></textarea>
+                                </div>
+                                <div th:if="${#fields.hasErrors('address')}" class="text-danger small mt-1"><span th:errors="*{address}"></span></div>
+                            </div>
+
+                            <!-- Occupation -->
+                            <div class="mb-3">
+                                <label for="occupation" class="form-label">Occupation</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                                    <input type="text" class="form-control" id="occupation" th:field="*{occupation}" placeholder="Enter your current occupation" required>
+                                </div>
+                                <div th:if="${#fields.hasErrors('occupation')}" class="text-danger small mt-1"><span th:errors="*{occupation}"></span></div>
+                            </div>
+
+                            <!-- Monthly Salary -->
+                            <div class="mb-3">
+                                <label for="monthlySalary" class="form-label">Monthly Salary</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                    <input type="number" class="form-control" id="monthlySalary" th:field="*{monthlySalary}" placeholder="Enter your monthly salary" step="0.01" min="0" required>
+                                </div>
+                                <div th:if="${#fields.hasErrors('monthlySalary')}" class="text-danger small mt-1"><span th:errors="*{monthlySalary}"></span></div>
+                            </div>
+
+                            <!-- Marital Status -->
+                            <div class="mb-3">
+                                <label for="maritalStatus" class="form-label">Marital Status</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-heart"></i></span>
+                                    <select class="form-select" id="maritalStatus" th:field="*{maritalStatus}" required>
+                                        <option value="">Select your marital status</option>
+                                        <option value="Single">Single</option>
+                                        <option value="Married">Married</option>
+                                    </select>
+                                </div>
+                                <div th:if="${#fields.hasErrors('maritalStatus')}" class="text-danger small mt-1"><span th:errors="*{maritalStatus}"></span></div>
+                            </div>
+
+                            <!-- Gender -->
+                            <div class="mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user-friends"></i></span>
+                                    <select class="form-select" id="gender" th:field="*{gender}" required>
+                                        <option value="">Select your gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div th:if="${#fields.hasErrors('gender')}" class="text-danger small mt-1"><span th:errors="*{gender}"></span></div>
+                            </div>
+
+                            <!-- Email -->
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email Address</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                    <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Enter your email address" required>
+                                    <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Enter a valid email address" required>
                                 </div>
                                 <div th:if="${#fields.hasErrors('email')}" class="text-danger small mt-1"><span th:errors="*{email}"></span></div>
                             </div>
+
+                            <!-- Password -->
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                    <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="Enter your password" required>
+                                    <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="Create a secure password" required>
                                 </div>
                                 <div class="form-text">Password must be at least 6 characters long.</div>
                                 <div th:if="${#fields.hasErrors('password')}" class="text-danger small mt-1"><span th:errors="*{password}"></span></div>
                             </div>
+
+                            <!-- Terms and Conditions -->
                             <div class="mb-4">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="terms" required>
                                     <label class="form-check-label" for="terms">I agree to the <a href="#" class="text-decoration-none">Terms and Conditions</a> and <a href="#" class="text-decoration-none">Privacy Policy</a></label>
                                 </div>
                             </div>
+
+                            <!-- Submit Button -->
                             <button type="submit" class="btn btn-primary w-100 mb-3"><i class="fas fa-user-plus me-2"></i>Create Account</button>
                         </form>
                         <div class="text-center"><p class="mb-0">Already have an account? <a href="/user/login" class="text-decoration-none">Sign in here</a></p></div>

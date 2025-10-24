@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Claim</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="/"><i class="fas fa-shield-alt me-2"></i>CeyMed Insurance</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/policy/policies">Policies</a></li>
+                <li class="nav-item"><a class="nav-link" href="/purchase/create">Purchase</a></li>
+                <li class="nav-item"><a class="nav-link active fw-semibold" href="/claims/submit">Submit Claim</a></li>
+                <li class="nav-item"><a class="nav-link" href="/claims/my-claims">My Claims</a></li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown" th:if="${session.user != null}">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i><span th:text="${session.user.firstName}">User</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/user/profile">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/user/logout">Logout</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item" th:if="${session.user == null}"><a class="nav-link" href="/user/login">Login</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-file-medical me-2"></i>Submit Insurance Claim</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Success/Error Messages -->
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span th:text="${success}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
+                    <form th:action="@{/claims/submit}" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="userId" class="form-label">User ID</label>
+                                <input type="text" class="form-control" id="userId" name="userId" 
+                                       th:value="${session.user != null ? session.user.customerId : ''}" required>
+                                <div class="form-text">Your user ID (auto-filled if logged in)</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="policyId" class="form-label">Policy ID</label>
+                                <input type="number" class="form-control" id="policyId" name="policyId" required>
+                                <div class="form-text">Enter the policy ID for this claim</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="claimAmount" class="form-label">Claim Amount (LKR)</label>
+                                <input type="number" class="form-control" id="claimAmount" name="claimAmount" 
+                                       step="0.01" min="0" required>
+                                <div class="form-text">Enter the amount you're claiming</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="hospitalName" class="form-label">Hospital Name</label>
+                                <input type="text" class="form-control" id="hospitalName" name="hospitalName" required>
+                                <div class="form-text">Name of the hospital where treatment was received</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Claim Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" 
+                                      placeholder="Please provide details about your medical treatment and expenses..."></textarea>
+                            <div class="form-text">Describe the medical treatment and expenses</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="hospitalBill" class="form-label">Hospital Bill</label>
+                            <input type="file" class="form-control" id="hospitalBill" name="hospitalBill" 
+                                   accept=".jpg,.jpeg,.png,.pdf" required>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Accepted formats: JPG, JPEG, PNG, PDF (Max size: 10MB)
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-outline-secondary me-md-2" onclick="clearForm()">
+                                <i class="fas fa-eraser me-1"></i>Clear Form
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i>Submit Claim
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Information Card -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Important Information</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Ensure you have purchased the policy before submitting a claim</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Claim amount must not exceed your policy coverage limit</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Upload clear, readable hospital bills</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Claims will be reviewed within 5-7 business days</li>
+                        <li class="mb-0"><i class="fas fa-check text-success me-2"></i>You will receive notifications about your claim status</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function clearForm() {
+        document.getElementById('userId').value = '';
+        document.getElementById('policyId').value = '';
+        document.getElementById('claimAmount').value = '';
+        document.getElementById('hospitalName').value = '';
+        document.getElementById('description').value = '';
+        document.getElementById('hospitalBill').value = '';
+    }
+
+    // File size validation
+    document.getElementById('hospitalBill').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.size > maxSize) {
+                alert('File size must be less than 10MB');
+                e.target.value = '';
+            }
+        }
+    });
+</script>
+</body>
+</html>
