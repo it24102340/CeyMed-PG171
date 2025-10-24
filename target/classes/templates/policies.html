@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Policies - CeyMed Insurance</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .policy-card { transition: transform 0.3s ease, box-shadow 0.3s ease; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);} 
+        .policy-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15);} 
+        .category-badge { font-size: 0.8rem; padding: 0.5rem 1rem; }
+        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); border: none; }
+        .btn-primary:hover { background: linear-gradient(45deg, #5a6fd8, #6a4190); }
+        .search-section { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px; padding: 2rem; margin-bottom: 2rem; }
+    </style>
+</head>
+<body >
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="/">
+                <i class="fas fa-shield-alt me-2"></i>CeyMed Insurance
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-semibold" href="/policy/policies">Policies</a></li>
+                    <li class="nav-item" th:if="${session.user != null}"><a class="nav-link" href="/purchase/history" >My Purchases</a></li>
+                    <li class="nav-item" th:if="${session.user != null}"><a class="nav-link" href="/claims/submit">Submit Claim</a></li>
+                    <li class="nav-item" th:if="${session.user != null}"><a class="nav-link" href="/claims/my-claims">My Claims</a></li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown" th:if="${session.user != null}">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i><span th:text="${session.user.firstName}">User</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/user/profile">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/user/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item" th:if="${session.user == null}"><a class="nav-link" href="/user/login">Login</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="fw-bold text-primary"><i class="fas fa-shield-alt me-2"></i>Insurance Policies</h1>
+                <p class="text-muted">Choose the perfect insurance plan for your needs</p>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <form th:action="@{/policy/search}" th:object="${searchDto}" method="post">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="policyId" class="form-label">Search by Policy ID</label>
+                        <input type="number" class="form-control" id="policyId" th:field="*{policyId}" placeholder="Enter Policy ID">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="category" class="form-label">Filter by Category</label>
+                        <select class="form-select" id="category" th:field="*{category}">
+                            <option value="">All Categories</option>
+                            <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2"><i class="fas fa-search me-1"></i>Search</button>
+                        <a href="/policy/policies" class="btn btn-outline-secondary"><i class="fas fa-refresh me-1"></i>Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="row g-4" th:if="${policies != null and !policies.empty}">
+            <div class="col-lg-4 col-md-6" th:each="policy : ${policies}">
+                <div class="card policy-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <h5 class="card-title fw-bold" th:text="${policy.policyName}">Policy Name</h5>
+                            <span class="badge category-badge" th:classappend="${policy.category == 'Premium'} ? 'bg-warning' : (${policy.category == 'Gold'} ? 'bg-success' : 'bg-secondary')" th:text="${policy.category}">Category</span>
+                        </div>
+                        <div class="mb-2"><small class="text-muted">ID: <span th:text="${policy.policyId}">0</span></small></div>
+                        <div class="mb-3">
+                            <div class="row text-center">
+                                <div class="col-6"><div class="border-end"><h6 class="text-muted mb-1">Coverage</h6><p class="fw-bold mb-0" th:text="${policy.coverage}">0.00</p></div></div>
+                                <div class="col-6"><h6 class="text-muted mb-1">Premium</h6><p class="fw-bold mb-0" th:text="${policy.premium}">0.00</p></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="row text-center">
+                                <div class="col-6"><div class="border-end"><h6 class="text-muted mb-1">Duration</h6><p class="fw-bold mb-0" th:text="${policy.duration} + ' months'">0 months</p></div></div>
+                                <div class="col-6"><h6 class="text-muted mb-1">Monthly Cost</h6><p class="fw-bold text-primary mb-0" th:text="${policy.monthlyCost}">0.00</p></div>
+                            </div>
+                        </div>
+                        <div class="mb-2"><small class="text-muted"><i class="fas fa-calendar me-1"></i><span th:text="${policy.startDate} + ' to ' + ${policy.endDate}">Date Range</span></small></div>
+                        <div class="mb-2" th:if="${policy.specification}"><small class="text-muted d-block">Specification</small><div class="small" th:text="${#strings.abbreviate(policy.specification, 100)}">Spec</div></div>
+                        <div class="mb-3" th:if="${policy.notes}"><small class="text-muted d-block">Notes</small><div class="small" th:text="${#strings.abbreviate(policy.notes, 100)}">Notes</div></div>
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-outline-secondary flex-fill" th:href="@{'/policy/details/' + ${policy.policyId}}"><i class="fas fa-eye me-1"></i>View More</a>
+                            <a class="btn btn-primary flex-fill" th:href="@{'/purchase/create'(policyId=${policy.policyId})}"><i class="fas fa-shopping-cart me-1"></i>Purchase</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center py-5" th:if="${policies == null or policies.empty}">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No policies found</h4>
+            <p class="text-muted">Try adjusting your search criteria or check back later for new policies.</p>
+        </div>
+    </div>
+
+    <div class="modal fade" id="purchaseModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-shopping-cart me-2"></i>Purchase Policy</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/purchase/create}" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" id="selectedPolicyId" name="policyId">
+                        <div class="mb-3">
+                            <label for="userEmail" class="form-label">Confirm Your Email</label>
+                            <input type="email" class="form-control" id="userEmail" name="userEmail" th:value="${session.user?.email}" required>
+                        </div>
+                        <div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>Monthly cost will be calculated as: Premium × Coverage</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-check me-1"></i>Confirm Purchase</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function purchasePolicy(policyId) {
+            document.getElementById('selectedPolicyId').value = policyId;
+            const modal = new bootstrap.Modal(document.getElementById('purchaseModal'));
+            modal.show();
+        }
+    </script>
+</body>
+</html>
+
+

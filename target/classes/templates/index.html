@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CeyMed Insurance - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+        }
+        .feature-card { transition: transform 0.3s ease; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);} 
+        .feature-card:hover { transform: translateY(-10px); }
+        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); border: none; padding: 12px 30px; font-weight: 600; }
+        .btn-primary:hover { background: linear-gradient(45deg, #5a6fd8, #6a4190); }
+        .btn-outline-primary { border: 2px solid #667eea; color: #667eea; padding: 12px 30px; font-weight: 600; }
+        .btn-outline-primary:hover { background: #667eea; border-color: #667eea; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="/">
+                <i class="fas fa-shield-alt me-2"></i>CeyMed Insurance
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link active fw-semibold" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/policy/policies">Policies</a></li>
+                    <li class="nav-item" th:if="${session.user != null}"><a class="nav-link" href="/purchase/history">My Purchases</a></li>
+                    <li class="nav-item" th:if="${session.user != null}"><a class="nav-link" href="/claims/submit">Submit Claim</a></li>
+                    <li class="nav-item" th:if="${session.user != null}"><a class="nav-link" href="/claims/my-claims">My Claims</a></li>
+                    <li class="nav-item" th:if="${session.user != null}"><a class="nav-link" href="/notifications/my-notifications">Notifications</a></li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown" th:if="${session.user != null}">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i><span th:text="${session.user.firstName}">User</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/user/profile">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/user/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item" th:if="${session.user == null}"><a class="nav-link" href="/user/login">Login</a></li>
+                    <li class="nav-item" th:if="${session.user == null}"><a class="btn btn-primary ms-2" href="/user/signup">Sign Up</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">Protect What Matters Most</h1>
+                    <p class="lead mb-4">Comprehensive insurance solutions tailored to your needs.</p>
+                    <div class="d-flex gap-3">
+                        <a href="/user/signup" class="btn btn-light btn-lg">Get Started</a>
+                        <a href="/policy/policies" class="btn btn-outline-light btn-lg">View Policies</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <i class="fas fa-shield-alt" style="font-size: 200px; opacity: 0.3;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-lg-8 mx-auto">
+                    <h2 class="fw-bold mb-3">Why Choose CeyMed Insurance?</h2>
+                    <p class="lead text-muted">We provide comprehensive coverage with exceptional service</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-heart text-primary mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="card-title fw-bold">Health Coverage</h5>
+                            <p class="card-text text-muted">Comprehensive health insurance plans with flexible options.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-star text-warning mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="card-title fw-bold">Premium Plans</h5>
+                            <p class="card-text text-muted">Gold, Silver, and Premium tiers for different needs.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-headset text-success mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="card-title fw-bold">24/7 Support</h5>
+                            <p class="card-text text-muted">Round-the-clock support for your insurance needs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row text-center mb-4">
+                <div class="col-lg-8 mx-auto">
+                    <h2 class="fw-bold mb-3">Latest Health Articles</h2>
+                    <p class="text-muted mb-0">Updates and tips from our team</p>
+                </div>
+            </div>
+            <div class="row g-4" th:if="${latestArticles != null and !#lists.isEmpty(latestArticles)}">
+                <div class="col-md-4" th:each="art : ${latestArticles}">
+                    <div class="card h-100 shadow-sm">
+                        <div th:if="${art.imageUrl != null}">
+                            <img th:src="${art.imageUrl}" class="card-img-top" alt="article image" style="height: 180px; object-fit: cover;">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0" th:text="${art.title}">Article title</h5>
+                                <small class="text-muted ms-2" th:text="${#temporals.format(art.updatedAt, 'dd MMM yyyy')}">Date</small>
+                            </div>
+                            <div class="card-text text-muted flex-grow-1" style="display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;" th:utext="${art.details}">Short details...</div>
+                            <div class="text-end">
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="openArticle(this)"
+                                        th:attr="data-title=${art.title},data-details=${art.details},data-date=${#temporals.format(art.updatedAt, 'dd MMM yyyy')}">
+                                    Read more
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center text-muted" th:if="${latestArticles == null or #lists.isEmpty(latestArticles)}">
+                No articles yet.
+            </div>
+        </div>
+    </section>
+
+    <div class="modal fade" id="articleModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="articleTitle">Article</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <small class="text-muted d-block mb-2" id="articleDate"></small>
+                    <div class="mb-0" id="articleDetails"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-shield-alt me-2"></i>CeyMed Insurance</h5>
+                    <p class="text-muted">Your trusted partner for comprehensive insurance solutions.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted">&copy; 2024 CeyMed Insurance. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openArticle(btn){
+            const { title, details, date } = btn.dataset;
+            document.getElementById('articleTitle').textContent = title || '';
+            document.getElementById('articleDate').textContent = date ? `Updated: ${date}` : '';
+            document.getElementById('articleDetails').textContent = details || '';
+            const modal = new bootstrap.Modal(document.getElementById('articleModal'));
+            modal.show();
+        }
+    </script>
+</body>
+</html>
+
+
