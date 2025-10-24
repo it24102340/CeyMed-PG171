@@ -27,7 +27,13 @@
                     </div>
                     <div class="p-4">
                         <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
+                            <i class="fas fa-check-circle me-2"></i>
+                            <div th:if="${successMessage != null and #strings.contains(successMessage, 'Customer ID')}" class="fw-bold">
+                                <i class="fas fa-id-card me-2"></i><span th:text="${successMessage}"></span>
+                            </div>
+                            <div th:if="${successMessage != null and !#strings.contains(successMessage, 'Customer ID')}">
+                                <span th:text="${successMessage}"></span>
+                            </div>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                         <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -57,6 +63,25 @@
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary w-100 mb-3"><i class="fas fa-sign-in-alt me-2"></i>Sign In</button>
+                        </form>
+
+                        <div class="text-center mb-3"><hr><p class="text-muted small">Staff Login</p></div>
+                        <form th:action="@{/user/staff-login}" th:object="${loginDto}" method="post">
+                            <div class="mb-3">
+                                <label for="staffEmail" class="form-label">Staff Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
+                                    <input type="email" class="form-control" id="staffEmail" th:field="*{email}" placeholder="Enter staff email" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="staffPassword" class="form-label">Staff Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                    <input type="password" class="form-control" id="staffPassword" th:field="*{password}" placeholder="Enter staff password" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-outline-success w-100 mb-3"><i class="fas fa-user-tie me-2"></i>Staff Sign In</button>
                         </form>
 
                         <div class="text-center mb-3"><hr><p class="text-muted small">Admin Login</p></div>

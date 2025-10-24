@@ -5,30 +5,202 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - CeyMed Insurance</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .profile-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem 0; margin-bottom: 2rem; }
+        .profile-card { border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 15px; }
+        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); border: none; }
+        .btn-primary:hover { background: linear-gradient(45deg, #5a6fd8, #6a4190); }
+        .form-control:focus { border-color: #667eea; box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25); }
+        .input-group-text { background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; }
+        .alert { border-radius: 10px; }
+    </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
     <div class="container">
-        <a class="navbar-brand" href="/">CeyMed Insurance</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/policy/policies">Policies</a></li>
-                <li class="nav-item"><a class="nav-link" href="/purchase/history">My Purchases</a></li>
-                <li class="nav-item"><a class="nav-link" href="/user/logout">Logout</a></li>
-            </ul>
-        </div>
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shield-alt me-2"></i>CeyMed Insurance
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/policy/policies">
+                    <i class="fas fa-file-contract me-1"></i>Policies
+                </a>
+                <a class="nav-link" href="/purchase/history">
+                    <i class="fas fa-history me-1"></i>Purchase History
+                </a>
+                <a class="nav-link" href="/claims/submit">
+                    <i class="fas fa-file-medical me-1"></i>Submit Claim
+                </a>
+                <a class="nav-link" href="/claims/my-claims">
+                    <i class="fas fa-clipboard-list me-1"></i>My Claims
+                </a>
+                <a class="nav-link active" href="/user/profile">
+                    <i class="fas fa-user me-1"></i>My Profile
+                </a>
+                <a class="nav-link" href="/user/logout">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
     </div>
     </nav>
 
-<div class="container py-4" th:if="${user}">
-    <h3 class="mb-3">My Profile</h3>
-    <div class="card">
-        <div class="card-body">
-            <div class="row mb-2"><div class="col-sm-3 fw-bold">User ID</div><div class="col-sm-9" th:text="${user.id}">1</div></div>
-            <div class="row mb-2"><div class="col-sm-3 fw-bold">First Name</div><div class="col-sm-9" th:text="${user.firstName}">First</div></div>
-            <div class="row mb-2"><div class="col-sm-3 fw-bold">Last Name</div><div class="col-sm-9" th:text="${user.lastName}">Last</div></div>
-            <div class="row mb-2"><div class="col-sm-3 fw-bold">Email</div><div class="col-sm-9" th:text="${user.email}">email@example.com</div></div>
-            <div class="row mb-2"><div class="col-sm-3 fw-bold">Admin</div><div class="col-sm-9" th:text="${user.isAdmin}">false</div></div>
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="container text-center">
+            <h1><i class="fas fa-user-circle me-3"></i>My Profile</h1>
+            <p class="lead">Update your personal information</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card profile-card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Update Profile Information</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form th:action="@{/user/profile/update}" th:object="${profileUpdateDto}" method="post">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="firstName" class="form-label">First Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                            <input type="text" class="form-control" id="firstName" th:field="*{firstName}" 
+                                                   placeholder="Enter first name" required>
+                                        </div>
+                                        <div th:if="${#fields.hasErrors('firstName')}" class="text-danger small mt-1">
+                                            <span th:errors="*{firstName}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="lastName" class="form-label">Last Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                            <input type="text" class="form-control" id="lastName" th:field="*{lastName}" 
+                                                   placeholder="Enter last name" required>
+                                        </div>
+                                        <div th:if="${#fields.hasErrors('lastName')}" class="text-danger small mt-1">
+                                            <span th:errors="*{lastName}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email Address</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                            <input type="email" class="form-control" id="email" th:field="*{email}" 
+                                                   placeholder="Enter email address" required>
+                                        </div>
+                                        <div th:if="${#fields.hasErrors('email')}" class="text-danger small mt-1">
+                                            <span th:errors="*{email}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="currentPassword" class="form-label">Current Password (for password change)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                            <input type="password" class="form-control" id="currentPassword" th:field="*{currentPassword}" 
+                                                   placeholder="Enter current password (only if changing password)">
+                                        </div>
+                                        <div class="form-text">Only required if you want to change your password.</div>
+                                        <div th:if="${#fields.hasErrors('currentPassword')}" class="text-danger small mt-1">
+                                            <span th:errors="*{currentPassword}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="newPassword" class="form-label">New Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                            <input type="password" class="form-control" id="newPassword" th:field="*{newPassword}" 
+                                                   placeholder="Enter new password (leave blank to keep current)">
+                                        </div>
+                                        <div class="form-text">Leave blank to keep your current password.</div>
+                                        <div th:if="${#fields.hasErrors('newPassword')}" class="text-danger small mt-1">
+                                            <span th:errors="*{newPassword}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-check-circle"></i></span>
+                                            <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}" 
+                                                   placeholder="Confirm new password">
+                                        </div>
+                                        <div class="form-text">Must match the new password above.</div>
+                                        <div th:if="${#fields.hasErrors('confirmPassword')}" class="text-danger small mt-1">
+                                            <span th:errors="*{confirmPassword}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save me-2"></i>Update Profile
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Current Profile Information (Read-only) -->
+                <div class="card profile-card mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Current Profile Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Customer ID:</strong> <span th:text="${user.customerId}"></span></p>
+                                <p><strong>Date of Birth:</strong> <span th:text="${user.dateOfBirth}"></span></p>
+                                <p><strong>Gender:</strong> <span th:text="${user.gender}"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Address:</strong> <span th:text="${user.address}"></span></p>
+                                <p><strong>Occupation:</strong> <span th:text="${user.occupation}"></span></p>
+                                <p><strong>Monthly Salary:</strong> $<span th:text="${user.monthlySalary}"></span></p>
+                                <p><strong>Marital Status:</strong> <span th:text="${user.maritalStatus}"></span></p>
+                            </div>
+                        </div>
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Note:</strong> You can only update your name, email, and password. 
+                            Other information can only be changed by contacting customer support.
+                        </div>
+                    </div>
+                </div>
         </div>
     </div>
 </div>
@@ -36,5 +208,3 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
